@@ -1,10 +1,7 @@
-import ProductManager from '../../classes/ProductManager.js'
 import productsModel from '../../models/products.model.js'
 
-const productManager = new ProductManager()
 
-
-const buildResponse = (data) => {
+export const buildResponse = (data) => {
 
     return {
         status: 'success',
@@ -15,18 +12,18 @@ const buildResponse = (data) => {
         page: data.page,
         hasPrevPage: data.hasPrevPage,
         hasNextPage: data.hasNextPage,
-        prevLink: data.hasPrevPage ? `http://localholst:8080/api/products?limit=${data.limit}&page=${data.prevPage}&query=${data.query}&sort=${data.sort}` : '',
-        nextLink: data.hasNextPage ? `http://localholst:8080/api/products?limit=${data.limit}&page=${data.nextPage}&query=${data.query}&sort=${data.sort}` : ''
+        prevLink: data.hasPrevPage ? `http://localhost:8080/api/products?limit=${data.limit}&page=${data.prevPage}&query=${data.query}&sort=${data.sort}` : '',
+        nextLink: data.hasNextPage ? `http://localhost:8080/api/products?limit=${data.limit}&page=${data.nextPage}&query=${data.query}&sort=${data.sort}` : ''
     }
 }
 
 
 export const getProducts = async (req, res) => {
 
-    const { page = 1, limit = 10 } = req.query
+    const { page = 1, limit = 10, query, sort } = req.query
     const queryOptions = {}
 
-    const opts = { page, limit }
+    const opts = { page, limit, sort: { price: sort || 'asc' } }
     const criteria = { queryOptions }
 
 
@@ -37,7 +34,7 @@ export const getProducts = async (req, res) => {
 
     if (sort) {
 
-        options.sort = sort === 'asc' ? 'price' : '-price'
+        opts.sort = sort === 'asc' ? 'price' : '-price'
     }
 
 
@@ -46,9 +43,10 @@ export const getProducts = async (req, res) => {
         const result = await productsModel.paginate (criteria, opts)
 
         res.status(200).json (buildResponse (result))
+        
     } catch (error) {
 
-        return res.status(500).json ({ error: 'Error al obtener productos' })
+        return res.status(500).json ({ error: 'Error al obtener productos', details: error.message })
     }
 }
 
@@ -65,10 +63,10 @@ export const getProductById = async (req, res) => {
             return res.json (product)
         } else {
 
-            return res.status( 404).json ({ error: 'Producto no encontrado' })
+            return res.status(404).json ({ error: 'Producto no encontrado' })
         }
     } catch (error) {
 
-        return res.status(500).json ({ error: 'Error' })
+        return res.status(500).json ({ error: 'Error al obtener el producto', details: error.message })
     }
 }

@@ -1,6 +1,4 @@
-import ProductManager from '../../classes/ProductManager.js'
-
-const productManager = new ProductManager()
+import productsModel from '../../models/products.model.js'
 
 
 export const deleteProduct = async (req, res) => {
@@ -9,18 +7,20 @@ export const deleteProduct = async (req, res) => {
 
     try {
 
-        const productToDelete = await productManager.getProductById (pid)
+        const productToDelete = await productsModel.findById (pid)
 
         if (!productToDelete) {
-            return res.status(404).json ({ error: 'Product not found' })
+
+            return res.status(404).json ({ error: 'Producto no encontrado' })
         }
 
-        await productManager.deleteProduct (pid)
+        await productToDelete.remove()
 
-        res.json ({ message: 'Producto eliminado correctamente', deletedProduct: productToDelete})
+        return res.json ({ message: 'Producto eliminado correctamente', deletedProduct: productToDelete})
+
     } catch (error) {
 
         console.error ('Error al eliminar el producto:', error)
-        res.status(500).json ({ message: 'Error interno del servidor'})
+        return res.status(500).json ({ message: 'Error interno del servidor'})
     }
 }

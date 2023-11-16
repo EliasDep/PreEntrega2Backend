@@ -10,6 +10,6 @@ export const init = async () => {
         console.log ('Database Connected ')
         
     } catch (error) {
-        console.log ('Error to connect to database')
+        console.log ('Error to connect to database', error.message)
     }
 }

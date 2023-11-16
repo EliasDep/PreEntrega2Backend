@@ -1,6 +1,4 @@
-import ProductManager from '../../classes/ProductManager.js'
-
-const productManager = new ProductManager()
+import productsModel from '../../models/products.model.js'
 
 
 export const updateProduct = async (req, res) => {
@@ -10,29 +8,26 @@ export const updateProduct = async (req, res) => {
     
     try {
         
-        const productToUpdate = await productManager.getProductById (pid)
+        const productToUpdate = await productsModel.findById (pid)
 
         if (!productToUpdate) {
-        return res.status(404).json ({ error: 'Producto no encontrado' })
+
+            return res.status(404).json ({ error: 'Producto no encontrado' })
         }
 
-        const updatedProduct = {
+        productToUpdate.title = title || productToUpdate.title
+        productToUpdate.description = description || productToUpdate.description
+        productToUpdate.price = price || productToUpdate.price
+        productToUpdate.code = code || productToUpdate.code
+        productToUpdate.stock = stock || productToUpdate.stock
 
-        title: title || productToUpdate.title,
-        description: description || productToUpdate.description,
-        price: price || productToUpdate.price,
-        code: code || productToUpdate.code,
-        stock: stock || productToUpdate.stock,
-        id: productToUpdate.id
-        }
-
-        await productManager.updateProduct (pid, updatedProduct)
+        await productToUpdate.save()
 
         return res.status(200).json ({ message: 'Producto actualizado correctamente' })
         
     } catch (error) {
 
         console.error ('Error al actualizar el producto:', error)
-        res.status(500).send('Error al actualizar el producto')
+        res.status(500).send ('Error al actualizar el producto')
     }
 }

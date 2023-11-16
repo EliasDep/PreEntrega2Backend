@@ -1,31 +1,27 @@
 import express from 'express'
-import path from 'path'
 import bodyParser from 'body-parser'
-import { fileURLToPath  } from 'url'
+import handlebars from 'express-handlebars'
+import path from 'path'
 
+import { __dirname } from './utils.js'
 import productsRouter from './routes/products/productsRouter.js'
-import newproductRouter from './routes/products/newproductRouter.js'
-import updateproductsRouter from './routes/products/updateproductRouter.js'
-import deleteproductRouter from './routes/products/deleteproductRouter.js'
 import cartsRouter from './routes/carts/cartsRouter.js'
-import newcartRouter from './routes/carts/newcartRouter.js'
-import cartproductRouter from './routes/carts/cartproductRouter.js'
-import deletecartRouter from './routes/carts/deletecartRouter.js'
-import updatecartRouter from './routes/carts/updatecartRouter.js'
+
 
 const app = express()
 
-const __filename = fileURLToPath (import.meta.url)
-const __dirname = path.dirname (__filename)
+
+app.engine ('handlebars', handlebars.engine())
+app.set ('views', path.join (__dirname, 'views'))
+app.set ('view engine', 'handlebars')
 
 app.use (express.json ())
 app.use (express.urlencoded ({ extended: true }))
 app.use (bodyParser.urlencoded({ extended: true }))
 app.use (express.static (path.join (__dirname, '../public')))
 
-app.use ('/', deleteproductRouter)
-app.use ('/api', productsRouter, updateproductsRouter, newcartRouter, cartsRouter,
-        cartproductRouter, newproductRouter, deletecartRouter, updatecartRouter)
+
+app.use ('/api', productsRouter, cartsRouter)
 
 
 app.use ((error, req, res, next) => {

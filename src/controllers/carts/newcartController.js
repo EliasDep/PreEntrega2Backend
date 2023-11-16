@@ -1,6 +1,4 @@
-import CartManager from '../../classes/CartManager.js'
-
-const cartManager = new CartManager
+import cartModel from '../../models/cart.model.js'
 
 
 export const createCart = async (req, res) => {
@@ -12,19 +10,18 @@ export const createCart = async (req, res) => {
       return res.status(400).json ({ error: 'Todos los campos son obligatorios.' })
     }
   
-    const newCart = {
-      products
-    }
+    const newCart = new cartModel ({
+        products
+    })
   
     try {
-      
-      await cartManager.addCart (newCart)
 
-      res.json ({ success: 'Producto agregado con éxito.' })
+        await newCart.save()
+        return res.status(200).json ({ success: 'Carrito creado con éxito.' })
+
     } catch (err) {
 
-      console.error ('Error al agregar el producto:', err.message)
-
-      return res.status(500).json ({ error: 'Error interno del servidor.' })
+        console.error ('Error al crear el carrito:', err.message)
+        return res.status(500).json ({ error: 'Error interno del servidor.' })
     }
 }
